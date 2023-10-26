@@ -8,9 +8,18 @@ namespace win_function
     public static class WinFunction
     {
         [FunctionName("WinFunction")]
-        public void Run([ServiceBusTrigger("myqueue", Connection = "")]string myQueueItem, ILogger log)
+        public static void Run([ServiceBusTrigger("myqueue", Connection = "ServiceBusConnectionString")]string myQueueItem, ILogger log)
         {
-            log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
+            log.LogInformation($"WinFunction- Received message with id: {myQueueItem}");
+            try
+            {               
+                UnzipProcessor unzipper = new UnzipProcessor(log);
+                unzipper.ProcessFileShare();
+            }
+            catch (Exception ex)
+            {
+                log.LogError($"Error is:  {ex.Message}");
+            }
         }
     }
 }
